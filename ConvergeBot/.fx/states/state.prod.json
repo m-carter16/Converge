@@ -1,0 +1,32 @@
+{
+    "solution": {
+        "provisionSucceeded": true,
+        "teamsAppTenantId": "4ad62eba-fb5c-41f6-a7a9-93c42c52a2b2",
+        "subscriptionId": "1953dc7b-1602-4c34-b8cf-1698a63e2ea3",
+        "subscriptionName": "Azure subscription 1",
+        "tenantId": "4ad62eba-fb5c-41f6-a7a9-93c42c52a2b2",
+        "needCreateResourceGroup": false,
+        "resourceGroupName": "ConvergeBot",
+        "location": "East US",
+        "resourceNameSuffix": "b18ff1"
+    },
+    "fx-resource-appstudio": {
+        "tenantId": "4ad62eba-fb5c-41f6-a7a9-93c42c52a2b2",
+        "teamsAppId": "b1465374-6cb3-4ab3-b1c1-78fbc97c4568"
+    },
+    "fx-resource-bot": {
+        "botId": "18d8c520-8a04-4ac0-bc42-c311ba694acd",
+        "botPassword": "{{fx-resource-bot.botPassword}}",
+        "skuName": "B1",
+        "siteName": "convergeboprod59e59cbot",
+        "domain": "convergeboprod59e59cbot.azurewebsites.net",
+        "appServicePlanName": "convergeboprod59e59cbot",
+        "resourceId": "/subscriptions/1953dc7b-1602-4c34-b8cf-1698a63e2ea3/resourceGroups/ConvergeBot/providers/Microsoft.Web/sites/convergeboprod59e59cbot",
+        "siteEndpoint": "https://convergeboprod59e59cbot.azurewebsites.net"
+    },
+    "fx-resource-identity": {
+        "identityName": "convergeboprod59e59c",
+        "identityResourceId": "/subscriptions/1953dc7b-1602-4c34-b8cf-1698a63e2ea3/resourceGroups/ConvergeBot/providers/Microsoft.ManagedIdentity/userAssignedIdentities/convergeboprod59e59c",
+        "identityClientId": "09c9deed-286a-40b0-a010-be7e89899e10"
+    }
+}

@@ -1,0 +1,136 @@
+name: github-azure-pipeline_dev
+
+on: 
+  push: 
+    branches: 
+    - main
+
+env: 
+  BuildParameters.solution: '**\*.sln'
+  APP_ID: 3f7dd971-ec5c-4393-971f-a204e3c3379d
+  AppEnvironment: 
+  AppInsightsInstrumentationKey: 942b4b2d-1013-4df8-be8a-48e7349d918a
+  ASPNETCORE_ENVIRONMENT: Production
+  Audience: api://converge-as-dev.azurewebsites.net/3f7dd971-ec5c-4393-971f-a204e3c3379d
+  ClientId: 3f7dd971-ec5c-4393-971f-a204e3c3379d
+  Instance: https://login.microsoftonline.com/
+  TenantId: 67bff79e-7f91-4433-a8e5-c9252d2ddc1d
+  BuildConfiguration: release
+  BuildParameters.WebAppName: converge-as-dev
+  BuildParameters.ConnectedServiceName: ""
+  BuildPlatform: "any cpu"
+  DESCRIPTION: "Go further together"
+  DOMAIN: converge-as-dev.azurewebsites.net
+  FilterUsersByTitle: ""
+  JobSchedules_PredictorSchedule: 0 0 * * *
+  JobSchedules_SyncPlacesSchedule: 0 11 * * *
+  KeyVaultName: converge-kv-dev
+  NewPlacesAvailableByDefault: false
+  SharePointListId: Converge_Places_new
+  SharePointPhotoListId: Converge_Places_Photos
+  SharePointSiteId: share.autodesk.com,a5dfb296-acc6-4b75-8224-1aaea6c5cbc7,a2a94499-3a04-4f61-88a8-7174c9d7e6cb
+  WEBSITE: https://share.autodesk.com/sites/ConvergeData
+  NETCORE_VERSION: 3.1.x
+  SharePointAdminListId: ConvergeSettings
+
+jobs:
+  build:
+    name: Build and Deploy
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup .Net core SDK ${{ env.NETCORE_VERSION }}
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: ${{ env.NETCORE_VERSION }}     
+
+    - name: Inject variables into appsettings
+      uses: microsoft/variable-substitution@v1
+      with:
+        files: '**/appsettings.json'
+      env:
+        AzureAd.TenantId: ${{ env.TenantId }}
+        AzureAd.ClientId: ${{ env.ClientId }}
+        AzureAd.Audience: ${{ env.Audience }}
+        SharePointSiteId: ${{ env.SharePointSiteId }}
+        SharePointListId: ${{ env.SharePointListId }}
+        SharePointPhotoListId: ${{ env.SharePointPhotoListId }}
+        AppInsightsInstrumentationKey: ${{ env.AppInsightsInstrumentationKey }}
+        KeyVaultName: ${{ env.KeyVaultName }}
+        JobSchedules.PredictorSchedule: ${{ env.JobSchedules_PredictorSchedule }}
+        JobSchedules.SyncPlacesSchedule: ${{ env.JobSchedules_SyncPlacesSchedule }}
+        FilterUsersByTitle: ${{ env.FilterUsersByTitle }}
+        AppEnvironment: ${{ env.AppEnvironment }}
+        AppBannerMessage: ${{ env.AppBannerMessage }}
+
+    - name: Read appsettings.json
+      id: package
+      uses: juliangruber/read-file-action@v1
+      with:
+        path: converge/appsettings.json
+    - name: Echo appsettings.json
+      run: echo "${{ steps.package.outputs.content }}"    
+
+    - name: Setup Nuget
+      uses: nuget/setup-nuget@v1
+
+    - name: Restore dependencies
+      run: nuget restore ${{env.BuildParameters.solution}}
+
+    # - name: Build
+    #   run: dotnet build --no-restore -c Release
+
+    # - name: Publish dotnet (not to Azure)
+    #   run: dotnet publish --no-build -c Release -o ${{ env.BUILD_PARAMS_PACKAGE_PATH }}
+
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v1.1
+
+    - name: Navigate to Workspace
+      run: cd ${{ github.workspace }}
+
+    - name: Create build directory
+      run: mkdir _build    
+
+    - name: Build solution **\*.sln
+      run: msbuild '${{ env.BuildParameters.solution }}' /p:configuration='${{ env.BuildConfiguration }}' /p:platform='${{ env.BuildPlatform }}' /p:DeployOnBuild=true /p:DeployDefaultTarget=WebPublish /p:WebPublishMethod=FileSystem /p:publishUrl="${{ env.Agent.TempDirectory }}\WebAppContent\\"
+    
+    - name: Use Node.js 14
+      uses: actions/setup-node@v3
+      with:
+        node-version: 14
+        
+    - name: Install dependencies
+      run: npm i
+      working-directory: Converge/ClientApp   
+
+#     - name: Install react-scripts for test
+#       run: npm i react-scripts
+#       working-directory: Converge/ClientApp   
+
+    - name: Run npm test
+      run: npm test
+      working-directory: Converge/ClientApp
+
+    # - name: VsTest - testAssemblies
+    #   run: |
+    #     $vsTestConsoleExe = "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\Extensions\TestPlatform\vstest.console.exe"
+    #     $targetTestDll = "**\${{ env.BuildConfiguration }}\*test*.dll
+    #     !**\obj\**"
+    #     $testRunSettings = "/Settings:`"`" "
+        
+    #     $command = "`& `"$vsTestConsoleExe`" `"$targetTestDll`" $testRunSettings $parameters "
+    #     Write-Host "$command"
+    #     Invoke-Expression $command
+    #   shell: powershell  
+     
+    - run: ls ${{ env.Agent.TempDirectory }}\WebAppContent\ClientApp\build
+
+    - name: 'Deploy to Azure WebApp'
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: ${{ env.BuildParameters.WebAppName }}
+        publish-profile: ${{ secrets.AZUREDEPLOYMENTSECRET }}
+        package: ${{ env.Agent.TempDirectory }}\WebAppContent    

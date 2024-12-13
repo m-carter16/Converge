@@ -1,0 +1,71 @@
+{
+  "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.9/MicrosoftTeams.schema.json",
+  "manifestVersion": "1.9",
+  "version": "2.0.6",
+  "id": "%APP_ID%",
+  "packageName": "com.microsoft.mwcci.converge",
+  "developer": {
+    "name": "Microsoft MWCCI",
+    "websiteUrl": "%WEBSITE%",
+    "privacyUrl": "https://%DOMAIN%%PORT%/privacy",
+    "termsOfUseUrl": "https://%DOMAIN%%PORT%/termsofuse"
+  },
+  "icons": {
+    "color": "color.png",
+    "outline": "outline.png"
+  },
+  "name": {
+    "short": "Converge%AppEnvironment%",
+    "full": "Converge%AppEnvironment%"
+  },
+  "description": {
+    "short": "%DESCRIPTION%",
+    "full": "%DESCRIPTION%"
+  },
+  "accentColor": "#FFFFFF",
+  "bots": [],
+  "composeExtensions": [],
+  "staticTabs": [
+    {
+      "entityId": "home",
+      "name": "Home",
+      "contentUrl": "https://%DOMAIN%%PORT%/tab",
+      "websiteUrl": "https://%DOMAIN%%PORT%/tab",
+      "scopes": [ "personal" ] 
+    },
+    {
+      "entityId": "teammates",
+      "name": "Teammates",
+      "contentUrl": "https://%DOMAIN%%PORT%/teammates",
+      "websiteUrl": "https://%DOMAIN%%PORT%/teammates",
+      "scopes": [ "personal" ] 
+    },
+    {
+      "entityId": "collaborate",
+      "name": "Collaborate",
+      "contentUrl": "https://%DOMAIN%%PORT%/collaborate",
+      "websiteUrl": "https://%DOMAIN%%PORT%/collaborate",
+      "scopes": [ "personal" ]
+    },
+    {
+      "entityId": "places",
+      "name": "Places",
+      "contentUrl": "https://%DOMAIN%%PORT%/places",
+      "websiteUrl": "https://%DOMAIN%%PORT%/places",
+      "scopes": [ "personal" ]
+    },
+    {
+      "entityId": "settings",
+      "name": "Settings",
+      "contentUrl": "https://%DOMAIN%%PORT%/settings",
+      "websiteUrl": "https://%DOMAIN%%PORT%/settings",
+      "scopes": [ "personal" ]
+    }
+  ],
+  "permissions": [ "identity" ],
+  "validDomains": [],
+  "webApplicationInfo": {
+    "id": "%APP_ID%",
+    "resource": "api://%DOMAIN%/%APP_ID%"
+  }
+}
